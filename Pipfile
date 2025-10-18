@@ -8,6 +8,7 @@ reportlab = "*"
 pymupdf = "*"
 
 [dev-packages]
+pyinstaller = "*"
 
 [requires]
 python_version = "3.13"

@@ -24,7 +24,7 @@ def check_ghostscript():
   gs_exe = 'gswin64c' if system == 'Windows' else 'gs'
   gs_path = shutil.which(gs_exe)
   if gs_path:
-    return True, gs_exe, gs_path, system
+    return True, gs_exe, gs_path
 
   sys_pms = {
     "Darwin": [
@@ -48,11 +48,11 @@ def check_ghostscript():
       pm_exec = pm["exec"]
       pm_install = pm["install"]
       if shutil.which(pm_exec):
-        return False, pm_exec, pm_install, system
+        return False, pm_exec, pm_install
   else:
-    return False, None, None, system
+    return False, None, None
   # Ensure a tuple is always returned
-  return False, None, None, system
+  return False, None, None
 
 def ghostscript_install_dialog(package_manager, install_cmd):
     root = tk.Tk()
@@ -106,7 +106,7 @@ def prompt_and_copy_pdf():
   root.withdraw()
   lender = simpledialog.askstring("User", "Enter your full name, Discord, or email:")
   borrower = simpledialog.askstring("User", "Enter borrower full name, Discord, or email:")
-  if not borrower or not lender:
+  if not borrower or not lender: # if not a borrower or not a lender be... -- Polonius the Coder
     print("Required string not provided. Exiting.")
     sys.exit(1)
   pdf_path = filedialog.askopenfilename(
@@ -122,10 +122,34 @@ def prompt_and_copy_pdf():
   temp_pdf_path = os.path.join(dir_name, temp_name)
   loaner_name = f"!LOANER_{base_name}"
   loaner_pdf_path = os.path.join(dir_name, loaner_name)
-  # Print to file without encryption
-  ghostscript_print(pdf_path, temp_pdf_path)
-  print(f"Printed PDF to {temp_pdf_path} (password removed if present)")
-  return lender, borrower, temp_pdf_path, loaner_pdf_path
+
+  # Check if the PDF is encrypted
+  is_encrypted = False
+  try:
+    with fitz.open(pdf_path) as test_doc:
+      is_encrypted = test_doc.is_encrypted
+  except Exception:
+    is_encrypted = True  # If can't open, assume encrypted
+
+  if is_encrypted:
+    # Check for Ghostscript
+    is_installed, exec, exec_path = check_ghostscript()
+
+    if not is_installed:
+      ghostscript_install_dialog(exec, exec_path)
+      is_installed, exec, exec_path = check_ghostscript()
+      if not is_installed:
+        print("Ghostscript is required but not installed. Exiting.")
+        sys.exit(1)
+    # Print to file without encryption
+    ghostscript_print(pdf_path, temp_pdf_path)
+    print(f"Printed unencrypted PDF to {temp_pdf_path}")
+    return lender, borrower, temp_pdf_path, loaner_pdf_path
+  else:
+    # No need to print to file, just use the original
+    shutil.copy(pdf_path, temp_pdf_path)
+    print("PDF is not encrypted; proceeding without Ghostscript.")
+    return lender, borrower, temp_pdf_path, loaner_pdf_path
 
 def create_diagonal_loaner_watermark(page_width, page_height):
   packet = BytesIO()
@@ -168,18 +192,11 @@ def create_vertical_watermark(lender, borrower, page_width, page_height):
   return packet.read()
 
 def main():
-  # Step 0: Check for Ghostscript
-  is_installed, exec, exec_path, platform = check_ghostscript()
-
-  if not is_installed:
-    ghostscript_install_dialog(exec, exec_path)
-
-  # Step 1: Prompt for user string and PDF file
+  # Step 0: Prompt for user string and PDF file
   lender, borrower, temp_pdf_path, loaner_pdf_path = prompt_and_copy_pdf()
 
-  # Step 2: Open the output PDF (unprotected) for watermarking
+  # Step 2: Open the input PDF (decrypted or original) for watermarking
   with fitz.open(temp_pdf_path) as doc_temp:
-
     # Get page dimensions from first page
     first_page = doc_temp[0]
     page_width, page_height = first_page.rect.width, first_page.rect.height
@@ -197,20 +214,21 @@ def main():
         # --- Insert left-margin vertical watermark on top ---
         page.show_pdf_page(page.rect, wm_user_pdf, 0, overlay=True)
 
-    # Save after watermarking
+    # Save after watermarking to a temp file (unprotected)
     doc_temp.save(temp_pdf_path, encryption=0, incremental=1)
 
+  # Step 3: Always save the final output with a random password
   with fitz.open(temp_pdf_path) as doc_loaner:
     pw = random_password()
     doc_loaner.save(loaner_pdf_path, encryption=4, owner_pw=pw)
     print(f"Watermarked PDF saved to: {loaner_pdf_path}")
-  
+
   os.remove(temp_pdf_path)
   print(f"Temporary file {temp_pdf_path} removed.")
 
   # open file for display
   if sys.platform.startswith('win'):
-    os.startfile(loaner_pdf_path)
+    getattr(os, 'startfile', lambda x: None)(loaner_pdf_path)
   elif sys.platform.startswith('darwin'):
     subprocess.run(['open', loaner_pdf_path])
   else:

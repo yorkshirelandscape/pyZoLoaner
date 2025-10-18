@@ -1,0 +1,85 @@
+name: Build and Release
+on:
+  push:
+    tags:
+      - '*'
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pipenv
+        run: pip install pipenv
+      - name: Install dependencies
+        run: pipenv install --dev
+      - name: Build with PyInstaller
+        run: pipenv run pyinstaller --onefile pyZoLoaner.py
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyZoLoaner-macos
+          path: dist/pyZoLoaner
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pipenv
+        run: pip install pipenv
+      - name: Install dependencies
+        run: pipenv install --dev
+      - name: Build with PyInstaller
+        run: pipenv run pyinstaller --onefile pyZoLoaner.py
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyZoLoaner-windows
+          path: dist/pyZoLoaner.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install pipenv
+        run: pip install pipenv
+      - name: Install dependencies
+        run: pipenv install --dev
+      - name: Build with PyInstaller
+        run: pipenv run pyinstaller --onefile pyZoLoaner.py
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyZoLoaner-linux
+          path: dist/pyZoLoaner
+
+  release:
+    needs: [build-macos, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/pyZoLoaner-macos/pyZoLoaner
+            dist/pyZoLoaner-windows/pyZoLoaner.exe
+            dist/pyZoLoaner-linux/pyZoLoaner
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
