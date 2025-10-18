@@ -73,7 +73,6 @@ jobs:
         uses: mindsers/changelog-reader-action@v2
         with:
           validation_level: warn
-          path: ./CHANGELOG.md
 
       - name: Checkout code
         uses: actions/checkout@v4
