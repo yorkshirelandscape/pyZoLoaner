@@ -68,14 +68,14 @@ jobs:
     needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
       - name: Get Changelog Entry
         id: changelog_reader
         uses: mindsers/changelog-reader-action@v2
         with:
           validation_level: warn
-
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Download artifacts
         uses: actions/download-artifact@v4
