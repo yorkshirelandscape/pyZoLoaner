@@ -92,5 +92,4 @@ jobs:
           body: ${{ steps.changelog_reader.outputs.changes }}
           draft: true
           allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: 'dist/pyZoLoaner-macos,dist/pyZoLoaner-windows,dist/pyZoLoaner-linux'
