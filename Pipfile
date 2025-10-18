@@ -9,6 +9,7 @@ pymupdf = "*"
 
 [dev-packages]
 pyinstaller = "*"
+keepachangelog-manager = "*"
 
 [requires]
 python_version = "3.13"

@@ -14,7 +14,7 @@ This cross-platform tool removes the weak PDF password protection from the PDF a
 - Cross-platform: works on Windows, macOS, and Linux (with Ghostscript installed)
 
 ## Requirements
-- [Ghostscript](https://www.ghostscript.com/) (must be installed and in PATH)
+- [Ghostscript](https://www.ghostscript.com/) (must be installed and in PATH to remove PDF passwords)
 
 ## Installation
 1. Download the appropriate executable from GitHub Releases: 
@@ -51,9 +51,3 @@ Run the executable and follow the prompts:
 
 ## License
 MIT License
-
-## Changelog
-
-### [0.1.0](https://github.com/yorkshirelandscape/pyZoLoaner/tree/0.1.0) &mdash;&mdash; *2025-10-18* &mdash;&mdash; Initial Release
-
-- Testing out the build and release process.

@@ -68,18 +68,30 @@ jobs:
     needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Get Changelog Entry
+        id: changelog_reader
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          validation_level: warn
+          path: ./CHANGELOG.md
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: dist
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
+      # Create a release for this specific version
+      - name: Update Release with Files
+        id: create_version_release
+        uses: ncipollo/release-action@v1
         with:
-          files: |
-            dist/pyZoLoaner-macos/pyZoLoaner
-            dist/pyZoLoaner-windows/pyZoLoaner.exe
-            dist/pyZoLoaner-linux/pyZoLoaner
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ steps.changelog_reader.outputs.version }}
+          name: Release ${{ steps.changelog_reader.outputs.version }}
+          body: ${{ steps.changelog_reader.outputs.changes }}
+          draft: true
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: 'dist/pyZoLoaner-macos,dist/pyZoLoaner-windows,dist/pyZoLoaner-linux'
