@@ -105,6 +105,7 @@ jobs:
         with:
           path: dist
           pattern: "*.zip"
+          merge-multiple: true
 
       # Create a release for this specific version
       - name: Update Release with Files
