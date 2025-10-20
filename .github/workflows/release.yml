@@ -104,6 +104,7 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           path: dist
+          pattern: 'pyZoLoaner-*.zip'
       - name: Confirm artifacts
         run: ls -lah dist
 
