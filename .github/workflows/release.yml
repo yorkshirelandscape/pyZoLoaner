@@ -89,9 +89,10 @@ jobs:
         id: create_version_release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.changelog_reader.outputs.version }}
-          name: Release ${{ steps.changelog_reader.outputs.version }}
-          body: ${{ steps.changelog_reader.outputs.changes }}
-          draft: true
           allowUpdates: true
-          artifacts: 'dist/pyZoLoaner-macos,dist/pyZoLoaner-windows,dist/pyZoLoaner-linux'
+          name: Release ${{ steps.changelog_reader.outputs.version }}
+          draft: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: './dist/pyZoLoaner-macos,./dist/pyZoLoaner-windows,./dist/pyZoLoaner-linux'
+          tag: ${{ steps.changelog_reader.outputs.version }}
+          body: ${{ steps.changelog_reader.outputs.changes }}
