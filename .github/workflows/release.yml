@@ -18,11 +18,18 @@ jobs:
         run: pipenv install --dev
       - name: Build with PyInstaller
         run: pipenv run pyinstaller --onefile pyZoLoaner.py
+      
+      - name: Zip artifact
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          directory: dist
+          filename: 'pyZoLoaner-macos.zip'
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: pyZoLoaner-macos
-          path: dist/pyZoLoaner
+          path: dist/pyZoLoaner-macos.zip
 
   build-windows:
     runs-on: windows-latest
@@ -38,11 +45,18 @@ jobs:
         run: pipenv install --dev
       - name: Build with PyInstaller
         run: pipenv run pyinstaller --onefile pyZoLoaner.py
+      
+      - name: Zip artifact
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          directory: dist
+          filename: 'pyZoLoaner-windows.zip'
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: pyZoLoaner-windows
-          path: dist/pyZoLoaner.exe
+          path: dist/pyZoLoaner-windows.zip
 
   build-linux:
     runs-on: ubuntu-latest
@@ -58,17 +72,24 @@ jobs:
         run: pipenv install --dev
       - name: Build with PyInstaller
         run: pipenv run pyinstaller --onefile pyZoLoaner.py
+      
+      - name: Zip artifact
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          directory: dist
+          filename: 'pyZoLoaner-linux.zip'
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: pyZoLoaner-linux
-          path: dist/pyZoLoaner
+          path: dist/pyZoLoaner-linux.zip
 
   release:
     needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -80,9 +101,11 @@ jobs:
           validation_level: warn
 
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: dist
+      - name: Confirm artifacts
+        run: ls -lah dist
 
       # Create a release for this specific version
       - name: Update Release with Files
@@ -92,7 +115,6 @@ jobs:
           allowUpdates: true
           name: Release ${{ steps.changelog_reader.outputs.version }}
           draft: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: './dist/pyZoLoaner-macos,./dist/pyZoLoaner-windows,./dist/pyZoLoaner-linux'
+          artifacts: 'dist/pyZoLoaner-macos.zip,dist/pyZoLoaner-windows.zip,dist/pyZoLoaner-linux.zip'
           tag: ${{ steps.changelog_reader.outputs.version }}
           body: ${{ steps.changelog_reader.outputs.changes }}
