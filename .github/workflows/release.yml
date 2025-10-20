@@ -105,8 +105,6 @@ jobs:
         with:
           path: dist
           pattern: 'pyZoLoaner-*.zip'
-      - name: Confirm artifacts
-        run: ls -lah dist
 
       # Create a release for this specific version
       - name: Update Release with Files
