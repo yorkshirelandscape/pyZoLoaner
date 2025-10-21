@@ -17,7 +17,7 @@ jobs:
       - name: Install dependencies
         run: pipenv install --dev
       - name: Build with PyInstaller
-        run: pipenv run pyinstaller --onefile pyZoLoaner.py
+        run: pipenv run pyinstaller --onefile -windowed pyZoLoaner.py
       
       - name: Zip artifact
         uses: thedoctor0/zip-release@0.7.6
@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies
         run: pipenv install --dev
       - name: Build with PyInstaller
-        run: pipenv run pyinstaller --onefile pyZoLoaner.py
+        run: pipenv run pyinstaller --onefile -windowed pyZoLoaner.py
       
       - name: Zip artifact
         uses: thedoctor0/zip-release@0.7.6
@@ -71,7 +71,7 @@ jobs:
       - name: Install dependencies
         run: pipenv install --dev
       - name: Build with PyInstaller
-        run: pipenv run pyinstaller --onefile pyZoLoaner.py
+        run: pipenv run pyinstaller --onefile -windowed pyZoLoaner.py
       
       - name: Zip artifact
         uses: thedoctor0/zip-release@0.7.6
