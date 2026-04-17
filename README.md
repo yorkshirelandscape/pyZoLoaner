@@ -4,6 +4,8 @@ A tool to help GMs more easily make use of Paizo Organized Play's generous loane
 
 This cross-platform tool adds custom watermarks for loaning a scenario PDF to another GM. Run the app, answer a couple questions, pick the PDF, and pyZoLoaner will create a new PDF with the watermarks applied. Just ask the GM to delete the file when they're done and make sure you keep track of what you've loaned out!
 
+Download the current release [here](https://github.com/yorkshirelandscape/pyZoLoaner/releases/latest).
+
 ## Features
 - Adds two watermarks to each page:
   - A vertical, bold, opaque string in the left margin containing your name/identifier and that of the borrower.
